@@ -10,36 +10,60 @@ namespace PortableDevices
         {
             if (args[0].Equals("verificar"))
             {
-                MtpDevice.FileManagerController.checkDevice();
+                checkCurrentDeviceOS(args[1]);
             }
             else
             {
-                executeApi(args);
+                if (ActiveSync.FileManagerController.checkDevice(false))
+                {
+                    executeApiForActiveSync(args);
+                } else
+                {
+                    executeApiForMtpDevice(args);
+                }
             }
 
             Console.ReadKey();
         }
 
-        public static void executeApi(string[] args)
+        public static void checkCurrentDeviceOS(string OS)
         {
+            if (OS.Equals("W"))
+            {
+                ActiveSync.FileManagerController.checkDevice(true);
+            }
+            else if (OS.Equals("A"))
+            {
+                MtpDevice.FileManagerController.checkDevice();
+            }
+        }
+
+        public static void executeApiForMtpDevice(string[] args)
+        {
+            string deviceFolder = MtpDevice.FileManagerModel.STORAGE_EN + @"\DCIM";
 
             switch (args[0])
             {
                 case "enviar":
                     Console.WriteLine("Enviando archivo al dispositivo ...");
-                    MtpDevice.FileManagerController.sendFileToDevice(args[1], args[2], args[3]);
+                    MtpDevice.FileManagerController.sendFileToDevice(deviceFolder, args[1], args[2], args[3]);
                     break;
                 case "traer":
                     Console.WriteLine("Enviando archivo a la PC ...");
-                    MtpDevice.FileManagerController.getFileFromDevice(args[1], args[2], args[3]);
+                    MtpDevice.FileManagerController.getFileFromDevice(deviceFolder, args[1], args[2]);
                     break;
                 case "borrar":
                     Console.WriteLine("Borrando archivo del dispositivo ...");
-                    MtpDevice.FileManagerController.deleteDeviceFile(args[1], args[2]);
+                    MtpDevice.FileManagerController.deleteDeviceFile(deviceFolder, args[1]);
                     break;
                 case "buscar":
                     Console.WriteLine("Buscando archivo del dispositivo ...");
-                    MtpDevice.FileManagerController.searchDeviceFile(args[1], args[2]);
+                    MtpDevice.FileManagerController.searchDeviceFile(deviceFolder, args[1]);
+                    break;
+                case "copiar":
+                    Console.WriteLine("Copiando archivo ...");
+                    Console.WriteLine("El método para copiar archivo no esta disponible en el API para Android");
+                    Console.WriteLine("Nombre del archivo: " + args[1] + " Nombre de la copia: " + args[2]);
                     break;
                 default:
                     break;
@@ -49,23 +73,7 @@ namespace PortableDevices
 
         }
 
-        static void Main2(string[] args)
-        {
-            RemoteDeviceManager manager = new RemoteDeviceManager();
-            RemoteDevice firstConnectedDevice = manager.Devices.FirstConnectedDevice;
-            if (args[0].Equals("verificar"))
-            {
-                ActiveSync.FileManagerController.checkDevice();
-            }
-            else
-            {
-                executeApi(args);
-            }
-
-            //Console.ReadKey();
-        }
-
-        public static void executeApi2(string[] args)
+        public static void executeApiForActiveSync(string[] args)
         {
             RemoteDeviceManager manager = new RemoteDeviceManager();
             RemoteDevice firstConnectedDevice = manager.Devices.FirstConnectedDevice;

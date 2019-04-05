@@ -5,19 +5,30 @@ namespace PortableDevices.ActiveSync
 {
     class FileManagerController
     {
-        public static bool checkDevice()
+        public static bool checkDevice(bool message)
         {
             RemoteDeviceManager manager = new RemoteDeviceManager();
             RemoteDevice firstConnectedDevice = manager.Devices.FirstConnectedDevice;
 
             if (firstConnectedDevice == null)
             {
-                Console.Error.WriteLine("No se encontro ningún dispositivo conectado");
+                if(message == true)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Error.WriteLine("No se encontro ningún dispositivo conectado");
+                    Console.ResetColor();
+                }
                 return false;
             }
             else
             {
-                Console.WriteLine("Dispositivo conectado -> " + firstConnectedDevice.Name + ":" + firstConnectedDevice.Platform);
+                if(message == true)
+                {
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine("Dispositivo conectado -> " + firstConnectedDevice.Name + ":" + firstConnectedDevice.Platform);
+                    Console.WriteLine("Dispositivo con Windows CE");
+                    Console.ResetColor();
+                }
                 return true;
             }
         }
@@ -53,7 +64,9 @@ namespace PortableDevices.ActiveSync
                     }
                     else
                     {
+                        Console.ForegroundColor = ConsoleColor.Red;
                         Console.Error.WriteLine("El archivo " + deviceFile + " no existe");
+                        Console.ResetColor();
                     }
                 }
             }
@@ -72,7 +85,9 @@ namespace PortableDevices.ActiveSync
                     }
                     else
                     {
+                        Console.ForegroundColor = ConsoleColor.Red;
                         Console.Error.WriteLine("El archivo " + file + " no existe");
+                        Console.ResetColor();
                     }
                 }
             }
@@ -87,11 +102,15 @@ namespace PortableDevices.ActiveSync
                     string myDocs = device.GetFolderPath(SpecialFolder.MyDocuments);
                     if (RemoteFile.Exists(device, myDocs + "\\" + file))
                     {
+                        Console.ForegroundColor = ConsoleColor.White;
                         Console.WriteLine("El archivo " + file + " fue encontrado");
+                        Console.ResetColor();
                     }
                     else
                     {
+                        Console.ForegroundColor = ConsoleColor.Red;
                         Console.Error.WriteLine("El archivo " + file + " no existe");
+                        Console.ResetColor();
                     }
                 }
             }
@@ -113,7 +132,9 @@ namespace PortableDevices.ActiveSync
                     }
                     else
                     {
+                        Console.ForegroundColor = ConsoleColor.Red;
                         Console.Error.WriteLine("El archivo " + file + " no existe");
+                        Console.ResetColor();
                     }
 
                 }

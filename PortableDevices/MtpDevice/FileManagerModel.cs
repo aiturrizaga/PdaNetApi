@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.IO;
 
 namespace PortableDevices.MtpDevice
 {
     class FileManagerModel
     {
-        // public static string _EN = "Internal shared storage";
-        // public static string _ES = "Almacenamiento interno compartido";
+        public static string STORAGE_EN = "Internal shared storage";
+        // public static string STORAGE_ES = "Almacenamiento interno compartido";
 
         public static PortableDevice getCurrentDevice()
         {
@@ -16,23 +16,23 @@ namespace PortableDevices.MtpDevice
             try
             {
                 var devices = new PortableDeviceCollection();
-                if (null == devices)
-                {
-                    Console.Error.WriteLine("Dispositivo no encontrado!");
-                }
-                else
-                {
+                //if (null == devices)
+                //{
+                    
+                //}
+                //else
+                //{
                     devices.Refresh();
                     currentDevice = devices.First();
-                    if (null == currentDevice)
+                    /*if (null == currentDevice)
                     {
                         Console.Error.WriteLine("Dispositivo no encontrado!");
                     }
                     else
                     {
                         Console.WriteLine("Dispositivo encontrado: " + currentDevice.FriendlyName);
-                    }
-                }
+                    }*/
+                //}
             }
             catch (Exception ex)
             {
@@ -41,8 +41,9 @@ namespace PortableDevices.MtpDevice
             return currentDevice;
         }
 
-        public static void sendFileToDevice(PortableDevice device, String deviceFolder, String localPath, String localFile)
+        public static bool sendFileToDevice(PortableDevice device, String deviceFolder, String localPath, String localFile, String newNameFile)
         {
+            bool status = false;
             try
             {
                 String phoneDir = deviceFolder;
@@ -50,21 +51,25 @@ namespace PortableDevices.MtpDevice
                 PortableDeviceFolder result = root.FindDir(phoneDir);
                 if (null == result)
                 {
-                    Console.Error.WriteLine(phoneDir + " no encontrado!");
+                    status = false;
                 }
                 else
                 {
                     device.TransferContentToDevice(result, localPath + localFile);
+                    status = true;
                 }
             }
             catch (Exception ex)
             {
                 Console.Error.WriteLine(ex.Message);
+                status = false;
             }
+            return status;
         }
 
-        public static void getFileFromDevice(PortableDevice device, String deviceFolder, String localPath, String file)
+        public static bool getFileFromDevice(PortableDevice device, String deviceFolder, String localPath, String file)
         {
+            bool status = false;
             try
             {
                 String phoneDir = deviceFolder;
@@ -72,22 +77,27 @@ namespace PortableDevices.MtpDevice
                 PortableDeviceFolder result = root.FindDir(phoneDir);
                 if (null == result)
                 {
-                    Console.Error.WriteLine(phoneDir + " no encontrado!");
+                    //Console.Error.WriteLine(phoneDir + " no encontrado!");
+                    status = false;
                 }
                 else
                 {
                     PortableDeviceFile deviceFile = ((PortableDeviceFolder)result).FindFile(file);
                     device.TransferContentFromDevice(deviceFile, localPath, file);
+                    status = true;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.Error.WriteLine(ex.Message);
+                //Console.Error.WriteLine(ex.Message);
+                status = false;
             }
+            return status;
         }
 
-        public static void deleteDeviceFile(PortableDevice device, String deviceFolder, String file)
+        public static bool deleteDeviceFile(PortableDevice device, String deviceFolder, String file)
         {
+            bool status = false;
             try
             {
                 String phoneDir = deviceFolder;
@@ -96,17 +106,21 @@ namespace PortableDevices.MtpDevice
                 PortableDeviceFile deviceFile = result.FindFile(file);
                 if (null == result)
                 {
-                    Console.Error.WriteLine(phoneDir + " no encontrado!");
+                    //Console.Error.WriteLine(phoneDir + " no encontrado!");
+                    status = false;
                 }
                 else
                 {
                     device.DeleteFile(deviceFile);
+                    status = true;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.Error.WriteLine(ex.Message);
+                //Console.Error.WriteLine(ex.Message);
+                status = false;
             }
+            return status;
         }
 
         public static bool searchDeviceFile(PortableDevice device, String deviceFolder, String file)
@@ -120,24 +134,26 @@ namespace PortableDevices.MtpDevice
                 PortableDeviceFile deviceFile = ((PortableDeviceFolder)result).FindFile(file);
                 if (null == result)
                 {
-                    Console.Error.WriteLine(phoneDir + " no encontrado!");
+                    status = false;
+                    //Console.Error.WriteLine(phoneDir + " no encontrado!");
                 }
                 else
                 {
                     if (null == deviceFile)
                     {
-                        Console.Error.WriteLine(file + " no encontrado!");
+                        //Console.Error.WriteLine(file + " no encontrado!");
                         status = false;
                     } else
                     {
-                        Console.WriteLine("El archivo " + file + " fue encontrado");
+                        //Console.WriteLine("El archivo " + file + " fue encontrado");
                         status = true;
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.Error.WriteLine(ex.Message);
+                //Console.Error.WriteLine(ex.Message);
+                status = false;
             }
             return status;
         }
