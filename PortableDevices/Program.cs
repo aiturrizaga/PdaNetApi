@@ -23,7 +23,8 @@ namespace PortableDevices
                 }
             }
 
-            Console.ReadKey();
+            // Comentar esta linea cuando se compile para producción
+            // Console.ReadKey();
         }
 
         public static void checkCurrentDeviceOS(string OS)

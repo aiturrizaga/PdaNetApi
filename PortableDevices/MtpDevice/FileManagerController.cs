@@ -10,10 +10,10 @@ namespace PortableDevices.MtpDevice
         public static bool checkDevice()
         {
             bool status = false;
+            PortableDevice currentDevice = FileManagerModel.getCurrentDevice();
             try
             {
-                PortableDevice currentDevice = FileManagerModel.getCurrentDevice();
-                if (null == currentDevice)
+                if (currentDevice == null)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.Error.WriteLine("Dispositivo no encontrado!");
@@ -26,6 +26,7 @@ namespace PortableDevices.MtpDevice
                     Console.WriteLine("Dispositivo con Android");
                     Console.ResetColor();
                     status = true;
+                    currentDevice.Disconnect();
                 }
             }
             catch (Exception ex)
@@ -34,45 +35,51 @@ namespace PortableDevices.MtpDevice
                 Console.Error.WriteLine(ex.Message);
                 Console.ResetColor();
                 status = false;
+                if (currentDevice != null)
+                {
+                    currentDevice.Disconnect();
+                }
             }
             return status;
         }
 
         public static void sendFileToDevice(String deviceFolder, String localPath, String localFile, String newNameFile)
         {
+            PortableDevice currentDevice = FileManagerModel.getCurrentDevice();
             try
             {
-                PortableDevice currentDevice = FileManagerModel.getCurrentDevice();
                 if (FileManagerModel.searchDeviceFile(currentDevice, deviceFolder, localFile))
                 {
                     FileManagerModel.deleteDeviceFile(currentDevice, deviceFolder, localFile);
-                    FileManagerModel.sendFileToDevice(currentDevice, deviceFolder, localPath, localFile, newNameFile);
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine("El archivo " + localFile + " fue movido al dispositivo");
-                    Console.ResetColor();
-                    currentDevice.Disconnect();
+                    
                 }
-                else
+                FileManagerModel.sendFileToDevice(currentDevice, deviceFolder, localPath, localFile, newNameFile);
+                Console.ForegroundColor = ConsoleColor.White;
+                if (FileManagerModel.searchDeviceFile(currentDevice, deviceFolder, localFile))
                 {
-                    FileManagerModel.sendFileToDevice(currentDevice, deviceFolder, localPath, localFile, newNameFile);
-                    Console.ForegroundColor = ConsoleColor.White;
                     Console.WriteLine("El archivo " + localFile + " fue movido al dispositivo");
-                    Console.ResetColor();
+                } else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Error.WriteLine("No se pudo enviar el archivo " + localFile + " al dispositivo");
                 }
+                Console.ResetColor();
+                currentDevice.Disconnect();
             }
             catch (Exception ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.Error.WriteLine(ex.Message);
                 Console.ResetColor();
+                currentDevice.Disconnect();
             }
         }
 
         public static void getFileFromDevice(String deviceFolder, String localPath, String file)
         {
+            PortableDevice currentDevice = FileManagerModel.getCurrentDevice();
             try
             {
-                PortableDevice currentDevice = FileManagerModel.getCurrentDevice();
                 if (FileManagerModel.searchDeviceFile(currentDevice, deviceFolder, file))
                 {
                     FileManagerModel.getFileFromDevice(currentDevice, deviceFolder, localPath, file);
@@ -83,8 +90,9 @@ namespace PortableDevices.MtpDevice
                 } else
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.Error.WriteLine("Error al mover el archivo a la PC");
+                    Console.Error.WriteLine("No se encontro el archivo en el dispositivo");
                     Console.ResetColor();
+                    currentDevice.Disconnect();
                 }
             }
             catch (Exception ex)
@@ -92,14 +100,15 @@ namespace PortableDevices.MtpDevice
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.Error.WriteLine(ex.Message);
                 Console.ResetColor();
+                currentDevice.Disconnect();
             }
         }
 
         public static void deleteDeviceFile(String deviceFolder, String file)
         {
+            PortableDevice currentDevice = FileManagerModel.getCurrentDevice();
             try
             {
-                PortableDevice currentDevice = FileManagerModel.getCurrentDevice();
                 if (FileManagerModel.searchDeviceFile(currentDevice, deviceFolder, file))
                 {
                     FileManagerModel.deleteDeviceFile(currentDevice, deviceFolder, file);
@@ -111,8 +120,9 @@ namespace PortableDevices.MtpDevice
                 else
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.Error.WriteLine("Error al eliminar el archivo");
+                    Console.Error.WriteLine("Error al eliminar, no se encontro el archivo");
                     Console.ResetColor();
+                    currentDevice.Disconnect();
                 }
             }
             catch (Exception ex)
@@ -120,15 +130,16 @@ namespace PortableDevices.MtpDevice
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.Error.WriteLine(ex.Message);
                 Console.ResetColor();
+                currentDevice.Disconnect();
             }
         }
 
         public static bool searchDeviceFile(String deviceFolder, String file)
         {
             bool status = false;
+            PortableDevice currentDevice = FileManagerModel.getCurrentDevice();
             try
             {
-                PortableDevice currentDevice = FileManagerModel.getCurrentDevice();
                 if(FileManagerModel.searchDeviceFile(currentDevice, deviceFolder, file))
                 {
                     Console.ForegroundColor = ConsoleColor.White;
@@ -150,6 +161,7 @@ namespace PortableDevices.MtpDevice
                 Console.Error.WriteLine(ex.Message);
                 Console.ResetColor();
                 status = false;
+                currentDevice.Disconnect();
             }
             return status;
         }
